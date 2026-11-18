@@ -7,3 +7,5 @@ registry/*.db
 registry/**/*.db
 .DS_Store
 crates/sealim-core/fuzz/corpus/
+web/pkg/
+examples/**/target/

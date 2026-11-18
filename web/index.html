@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sealim verifier</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="page-header">
+    <h1>Sealim verifier</h1>
+    <p class="lede">Check a signed QR code against a local trust file. Hashing and verification run in WebAssembly in this tab; QR text, documents, and trust files are not uploaded to any server.</p>
+  </header>
+
+  <main class="layout">
+    <section class="panel" aria-labelledby="qr-heading">
+      <h2 id="qr-heading">QR payload</h2>
+      <label class="field" for="qr-text">Paste QR text (<code>SL1:</code> prefix)</label>
+      <textarea id="qr-text" rows="4" spellcheck="false" autocomplete="off"></textarea>
+
+      <div class="row">
+        <div class="field">
+          <label for="qr-image">QR image file</label>
+          <input type="file" id="qr-image" accept="image/*">
+        </div>
+        <div class="field">
+          <button type="button" id="scan-camera" class="secondary" hidden>Scan with camera</button>
+          <video id="camera-preview" class="camera" hidden playsinline muted></video>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="doc-heading">
+      <h2 id="doc-heading">Document file (optional)</h2>
+      <p class="hint">Drop or choose the credential file to compare its SHA-256 with the payload. Leave empty to verify signature and claims only.</p>
+      <div class="dropzone" id="doc-drop">
+        <label class="field" for="doc-file">Document</label>
+        <input type="file" id="doc-file">
+        <p class="hint" id="doc-name">Drop a file here or choose one. Nothing is uploaded.</p>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="trust-heading">
+      <h2 id="trust-heading">Trust file</h2>
+      <label class="field" for="trust-file">sealim-trust v1 JSON</label>
+      <input type="file" id="trust-file" accept="application/json,.json">
+      <button type="button" id="demo-trust" class="secondary">Try University of Waghi demo</button>
+      <p id="trust-status" class="status-line" role="status"></p>
+    </section>
+
+    <section class="panel" aria-labelledby="registry-heading">
+      <h2 id="registry-heading">Registry (optional)</h2>
+      <label class="field" for="registry-url">Registry base URL</label>
+      <input type="url" id="registry-url" placeholder="https://registry.example.invalid" autocomplete="off" inputmode="url">
+      <p class="hint">Used only when the payload registry flag is set. The page sends <code>GET /v1/documents/{doc_id}</code>; it never posts or sends your document.</p>
+    </section>
+
+    <section class="actions">
+      <button type="button" id="verify-btn">Verify</button>
+    </section>
+
+    <section id="result" class="result" hidden aria-live="polite" aria-atomic="true">
+      <div id="result-banner" class="result-banner"></div>
+      <dl id="result-meta" class="meta"></dl>
+      <h3 class="claims-heading" id="claims-heading" hidden>Visible claims</h3>
+      <table id="claims-table" class="claims" hidden>
+        <thead><tr><th scope="col">Key</th><th scope="col">Value</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="page-footer">
+    <p><a href="https://github.com/Emmanue707/sealim">Sealim</a> — offline verification toolkit. Not independently audited.</p>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
