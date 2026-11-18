@@ -4,5 +4,6 @@ crates/sealim-core/fuzz/target/
 *.key
 *.age
 registry/*.db
+registry/**/*.db
 .DS_Store
 crates/sealim-core/fuzz/corpus/
