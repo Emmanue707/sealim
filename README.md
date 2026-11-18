@@ -19,7 +19,7 @@ flowchart LR
 
 ## Quick start
 
-Requires Rust (stable) and Go 1.25 or newer.
+Requires Rust (stable) and Go 1.26 or newer.
 
 ```bash
 git clone https://github.com/Emmanue707/sealim.git
@@ -84,7 +84,11 @@ sealim seal --key issuer.key --passphrase-file pass.txt \
 ```bash
 sealim verify --qr "$QR" --file document.bin --trust trust.json
 sealim verify --image scan.png --trust trust.json
+sealim verify --qr "$QR" --file document.bin --trust trust.json \
+  --registry http://127.0.0.1:8080
 ```
+
+When the payload has the registry flag set (see `sealim seal --registry`), pass `--registry URL` or set `SEALIM_REGISTRY_URL`. If the registry cannot be reached, verification returns `STATUS_UNKNOWN` (exit 1).
 
 **`sealim inspect`** — decode payload only (no trust file):
 
@@ -115,11 +119,33 @@ sealim inspect --qr "$QR"
 
 Known-answer test vectors are in [`testvectors/`](testvectors/).
 
+## Registry
+
+The Go service under `registry/` implements the document-status API from [SPEC.md](SPEC.md) section 7. It listens on loopback by default and expects TLS termination in front when exposed on a network.
+
+Run locally from `registry/` (synthetic trust file and a 64-character hex seed file required):
+
+```bash
+export SEALIM_REGISTRY_ADDR=127.0.0.1:8080
+export SEALIM_DB=/tmp/sealim-registry.db
+export SEALIM_TRUST_FILE=/path/to/trust.json
+export SEALIM_REGISTRY_KEY=/path/to/registry.seed   # 64 hex chars, mode 0600
+go run ./cmd/sealim-registry
+```
+
+The registry stores only `doc_id`, hashes, `key_id`, issue time, status, reason codes, and timestamps. It must not store credential files, names, or claims.
+
+Build a local container image:
+
+```bash
+docker build -t sealim-registry:local registry/
+```
+
 ## Roadmap
 
 - [x] Core library: encode, sign, verify payloads
 - [x] CLI: keygen, seal, verify, inspect
-- Registry: SQLite-backed API from `SPEC.md`
+- [x] Registry: SQLite-backed API from `SPEC.md`
 - Browser verifier: WASM plus static UI
 
 Normative details: [SPEC.md](SPEC.md). Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).

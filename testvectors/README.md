@@ -25,3 +25,5 @@ cargo test -p sealim-core --test generate_vectors write_vectors -- --ignored --n
 ```
 
 The integration test `load_vectors` loads every file here and checks `expected_code`.
+
+Issuer request (SPEC section 7.1) known-answer files `registry_request_valid.json` and `registry_request_bad_signature.json` use a different schema (method, path, body, signature). They are checked by Rust and Go tests, not by `load_vectors`.
