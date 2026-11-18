@@ -1,5 +1,6 @@
 mod cmd_inspect;
 mod cmd_keygen;
+mod cmd_register;
 mod cmd_seal;
 mod cmd_verify;
 mod decode;
@@ -113,6 +114,27 @@ enum Commands {
 
         #[arg(long)]
         json: bool,
+
+        #[arg(long, env = "SEALIM_REGISTRY_URL")]
+        registry: Option<String>,
+    },
+
+    /// Register a sealed document with a status registry
+    Register {
+        #[arg(long, required = true)]
+        key: PathBuf,
+
+        #[arg(long)]
+        passphrase_file: Option<PathBuf>,
+
+        #[arg(long, conflicts_with_all = ["qr_file", "image"])]
+        qr: Option<String>,
+
+        #[arg(long, conflicts_with_all = ["qr", "image"])]
+        qr_file: Option<PathBuf>,
+
+        #[arg(long, conflicts_with_all = ["qr", "qr_file"])]
+        image: Option<PathBuf>,
 
         #[arg(long, env = "SEALIM_REGISTRY_URL")]
         registry: Option<String>,
@@ -254,6 +276,24 @@ fn run_command(command: Commands) -> Result<ExitCode, exit::CliError> {
                 json,
             })?;
             Ok(ExitCode::SUCCESS)
+        }
+        Commands::Register {
+            key,
+            passphrase_file,
+            qr,
+            qr_file,
+            image,
+            registry,
+        } => {
+            let code = cmd_register::run(cmd_register::RegisterOptions {
+                key,
+                passphrase_file,
+                qr,
+                qr_file,
+                image,
+                registry,
+            })?;
+            Ok(ExitCode::from(code as u8))
         }
     }
 }

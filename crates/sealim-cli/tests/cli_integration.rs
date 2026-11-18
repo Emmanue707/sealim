@@ -388,3 +388,135 @@ fn verify_registry_stub_revoked() {
         .code(1)
         .stdout(predicate::str::contains("REVOKED"));
 }
+
+#[test]
+fn register_posts_to_stub_registry() {
+    use std::io::{Read, Write};
+    use std::net::TcpListener;
+    use std::sync::mpsc;
+    use std::thread;
+
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let addr = listener.local_addr().unwrap();
+    let (tx, rx) = mpsc::channel();
+    thread::spawn(move || {
+        if let Ok((mut stream, _)) = listener.accept() {
+            let mut req = [0u8; 8192];
+            let n = stream.read(&mut req).unwrap_or(0);
+            let seen = String::from_utf8_lossy(&req[..n]);
+            let _ = tx.send(seen.contains("POST /v1/documents"));
+            let body = r#"{"doc_id":"aa","status":"valid","reason":null,"superseded_by":null,"updated_at":"2026-01-01T00:00:00Z"}"#;
+            let _ = write!(
+                stream,
+                "HTTP/1.1 201 Created\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+                body.len(),
+                body
+            );
+        }
+    });
+
+    let dir = TempDir::new().unwrap();
+    setup_key_and_trust(&dir);
+    let pass_path = dir.path().join("pass.txt");
+    let key_path = dir.path().join("issuer.key");
+    let doc = dir.path().join("document.bin");
+    fs::write(&doc, b"register test document").unwrap();
+
+    let seal_out = bin()
+        .args([
+            "seal",
+            "--key",
+            key_path.to_str().unwrap(),
+            "--passphrase-file",
+            pass_path.to_str().unwrap(),
+            "--file",
+            doc.to_str().unwrap(),
+        ])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    let qr = String::from_utf8_lossy(&seal_out).trim().to_string();
+
+    bin()
+        .args([
+            "register",
+            "--key",
+            key_path.to_str().unwrap(),
+            "--passphrase-file",
+            pass_path.to_str().unwrap(),
+            "--qr",
+            &qr,
+            "--registry",
+            &format!("http://{}", addr),
+        ])
+        .assert()
+        .code(0)
+        .stdout(predicate::str::contains("valid"));
+
+    assert!(rx.recv_timeout(std::time::Duration::from_secs(2)).unwrap());
+}
+
+#[test]
+fn register_conflict_exits_one() {
+    use std::io::{Read, Write};
+    use std::net::TcpListener;
+    use std::thread;
+
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let addr = listener.local_addr().unwrap();
+    thread::spawn(move || {
+        if let Ok((mut stream, _)) = listener.accept() {
+            let mut req = [0u8; 8192];
+            let _ = stream.read(&mut req).unwrap_or(0);
+            let body = r#"{"error":"already registered"}"#;
+            let _ = write!(
+                stream,
+                "HTTP/1.1 409 Conflict\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+                body.len(),
+                body
+            );
+        }
+    });
+
+    let dir = TempDir::new().unwrap();
+    setup_key_and_trust(&dir);
+    let pass_path = dir.path().join("pass.txt");
+    let key_path = dir.path().join("issuer.key");
+    let doc = dir.path().join("document.bin");
+    fs::write(&doc, b"register conflict document").unwrap();
+
+    let seal_out = bin()
+        .args([
+            "seal",
+            "--key",
+            key_path.to_str().unwrap(),
+            "--passphrase-file",
+            pass_path.to_str().unwrap(),
+            "--file",
+            doc.to_str().unwrap(),
+        ])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    let qr = String::from_utf8_lossy(&seal_out).trim().to_string();
+
+    bin()
+        .args([
+            "register",
+            "--key",
+            key_path.to_str().unwrap(),
+            "--passphrase-file",
+            pass_path.to_str().unwrap(),
+            "--qr",
+            &qr,
+            "--registry",
+            &format!("http://{}", addr),
+        ])
+        .assert()
+        .code(1)
+        .stdout(predicate::str::contains("already registered"));
+}
