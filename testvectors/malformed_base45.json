@@ -1,0 +1,26 @@
+{
+  "description": "Invalid base45 alphabet",
+  "expected_claims": [],
+  "expected_code": "MALFORMED",
+  "file_hex": null,
+  "public_key_b64url": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+  "qr_text": "SL1:???",
+  "registry_status": null,
+  "seed_hex": "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20",
+  "trust": {
+    "format": "sealim-trust",
+    "issuers": [
+      {
+        "key_id": "65b60673d6ed884b",
+        "name": "University of Waghi",
+        "public_key": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+        "registry_public_key": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+        "registry_url": "https://registry.example.invalid/v1",
+        "valid_from": "2020-01-01T00:00:00Z",
+        "valid_until": null
+      }
+    ],
+    "updated_at": "2026-01-01T00:00:00Z",
+    "version": 1
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "description": "Claims records not sorted by key",
+  "expected_claims": [],
+  "expected_code": "MALFORMED",
+  "file_hex": null,
+  "public_key_b64url": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+  "qr_text": "SL1:W50S%CV 0V7RGAHCQLK+PS9UH00PE4XS8-.C4CH000000O3DL*GISIX$N5DD1ZAF2H%5DJWSQSN2-T.AQ%1R $2E99UE23IR:4L+006.D6I91/DW34XEDNCCBUCNF6TF63W5Y96.96./3MX7HOAO34+3EY9EBWE3/DMO1-2LXJ6OGFLNF6TG*SL*9L5T0BCR-UAO8PY%6UAW3UE%FKLQTVNLUNT3EMA*2B6LGVQ8HII+B7H3QQ3YNCWC8O:B0AC:6D",
+  "registry_status": null,
+  "seed_hex": "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20",
+  "trust": {
+    "format": "sealim-trust",
+    "issuers": [
+      {
+        "key_id": "65b60673d6ed884b",
+        "name": "University of Waghi",
+        "public_key": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+        "registry_public_key": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+        "registry_url": "https://registry.example.invalid/v1",
+        "valid_from": "2020-01-01T00:00:00Z",
+        "valid_until": null
+      }
+    ],
+    "updated_at": "2026-01-01T00:00:00Z",
+    "version": 1
+  }
+}

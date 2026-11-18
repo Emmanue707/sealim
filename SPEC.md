@@ -205,6 +205,8 @@ Claims `d=2026-01-15␟n=Jane Kila␟t=BSc Computing` (␟ is `0x1F`) are 40 byt
 | Base45 text (3 characters per 2 bytes) | 258 characters |
 | QR text with `SL1:` | 262 characters |
 
+Known-answer test vectors are in [`testvectors/`](testvectors/).
+
 ## 9. Versioning
 
 Any change to binary layout **MUST** increment the payload `version` byte and be documented in a new SPEC revision. Verifiers **MUST** return `UNSUPPORTED_VERSION` for unknown versions.
