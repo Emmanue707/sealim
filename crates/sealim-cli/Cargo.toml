@@ -1,0 +1,15 @@
+[package]
+name = "sealim-cli"
+description = "Command-line tool to seal and verify Sealim documents"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "sealim"
+path = "src/main.rs"
+
+[dependencies]
+sealim-core = { path = "../sealim-core" }
