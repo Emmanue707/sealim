@@ -37,13 +37,16 @@ cd registry && go test ./...
 | `crates/sealim-cli` | `sealim` command |
 | `crates/sealim-wasm` | WebAssembly bindings for the browser verifier |
 | `registry/` | Document status registry (Go) |
+| `testvectors/` | Known-answer verification test cases |
 | `SPEC.md` | Normative format and APIs |
 | `THREAT_MODEL.md` | Threat model |
 | `SECURITY.md` | Vulnerability reporting |
 
+Known-answer test vectors are in [`testvectors/`](testvectors/).
+
 ## Roadmap
 
-- Core library: encode, sign, verify payloads
+- [x] Core library: encode, sign, verify payloads
 - CLI: `keygen`, `sign`, `verify`, `revoke`
 - Registry: SQLite-backed API from `SPEC.md`
 - Browser verifier: WASM plus static UI
