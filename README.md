@@ -3,6 +3,7 @@
 Seal certificates and transcripts with signed QR codes that anyone can verify offline.
 
 [![Licence](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![CI](https://github.com/Emmanue707/sealim/actions/workflows/ci.yml/badge.svg)](https://github.com/Emmanue707/sealim/actions/workflows/ci.yml)
 
 ## How it works
 
@@ -57,9 +58,20 @@ cargo run -p sealim-cli -- verify \
 cd registry && go test ./...
 ```
 
+Browser verifier (build WASM, then serve the repository root on loopback):
+
+```bash
+web/build.sh
+python3 -m http.server 8765 --bind 127.0.0.1
+```
+
+Open `http://127.0.0.1:8765/web/`. Demo fixtures: `examples/university-of-waghi/generate.sh`.
+
+![Browser verifier showing a valid University of Waghi demo transcript](docs/web-verifier.png)
+
 ## Usage
 
-Subcommands: `keygen`, `seal`, `verify`, `inspect`. Global options: `--help`, `--version`.
+Subcommands: `keygen`, `seal`, `verify`, `inspect`, `register`. Global options: `--help`, `--version`.
 
 **`sealim keygen`** — create an encrypted issuer key (`sealim-key` v1: Argon2id KDF + age ciphertext over the 32-byte Ed25519 seed; never a raw seed on disk):
 
@@ -96,6 +108,15 @@ When the payload has the registry flag set (see `sealim seal --registry`), pass 
 sealim inspect --qr "$QR"
 ```
 
+**`sealim register`** — post document metadata to a registry (`POST /v1/documents`):
+
+```bash
+sealim register --key issuer.key --passphrase-file pass.txt \
+  --qr "$QR" --registry http://127.0.0.1:8080
+```
+
+Exit `0` on HTTP 200/201, `1` on HTTP 409, `2` on usage, auth, or I/O errors. Requires `--registry` or `SEALIM_REGISTRY_URL`.
+
 ### Verify exit codes
 
 | Exit | When |
@@ -111,6 +132,8 @@ sealim inspect --qr "$QR"
 | `crates/sealim-core` | Payload format and cryptography |
 | `crates/sealim-cli` | `sealim` command |
 | `crates/sealim-wasm` | WebAssembly bindings for the browser verifier |
+| `web/` | Static browser verifier page |
+| `examples/university-of-waghi/` | Synthetic demo transcript and trust file |
 | `registry/` | Document status registry (Go) |
 | `testvectors/` | Known-answer verification test cases |
 | `SPEC.md` | Normative format and APIs |
@@ -146,7 +169,7 @@ docker build -t sealim-registry:local registry/
 - [x] Core library: encode, sign, verify payloads
 - [x] CLI: keygen, seal, verify, inspect
 - [x] Registry: SQLite-backed API from `SPEC.md`
-- Browser verifier: WASM plus static UI
+- [x] Browser verifier: WASM plus static UI
 
 Normative details: [SPEC.md](SPEC.md). Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
 
