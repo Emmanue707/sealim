@@ -1,0 +1,14 @@
+{
+  "format": "sealim-trust",
+  "issuers": [
+    {
+      "key_id": "65b60673d6ed884b",
+      "name": "University of Waghi",
+      "public_key": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+      "valid_from": "2020-01-01T00:00:00Z",
+      "valid_until": null
+    }
+  ],
+  "updated_at": "2026-01-01T00:00:00Z",
+  "version": 1
+}

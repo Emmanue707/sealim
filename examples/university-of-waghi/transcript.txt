@@ -1,0 +1,10 @@
+University of Waghi — OFFICIAL TRANSCRIPT (DEMO)
+==================================================
+
+Holder: Jane Kila
+Award: BSc Computing
+Date: 2026-01-15
+
+This document is synthetic fixture data for Sealim demos.
+The signing key is a public test vector only (seed 0x01..0x20).
+Do not use for real credentials.
