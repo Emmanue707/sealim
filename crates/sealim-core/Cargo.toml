@@ -18,6 +18,7 @@ unicode-normalization = "0.1"
 hex = "0.4"
 base64 = "0.22"
 getrandom = { version = "0.2", optional = true }
+time = { version = "0.3", features = ["parsing"] }
 
 [features]
 default = ["trust"]

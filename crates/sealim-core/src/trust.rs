@@ -136,51 +136,9 @@ fn parse_key_id_hex(s: &str) -> Result<[u8; 8], TrustError> {
 }
 
 fn parse_rfc3339_secs(s: &str) -> Result<i64, TrustError> {
-    let dt = chrono_from_rfc3339(s)?;
-    Ok(dt)
-}
-
-/// Minimal RFC3339 parser for trust timestamps (UTC Z suffix).
-fn chrono_from_rfc3339(s: &str) -> Result<i64, TrustError> {
-    if s.len() < 20 {
-        return Err(TrustError::InvalidTimestamp);
-    }
-    let (date, time) = s.split_once('T').ok_or(TrustError::InvalidTimestamp)?;
-    if date.len() != 10 || time.len() < 8 {
-        return Err(TrustError::InvalidTimestamp);
-    }
-    let year: i64 = date[0..4]
-        .parse()
-        .map_err(|_| TrustError::InvalidTimestamp)?;
-    let month: i64 = date[5..7]
-        .parse()
-        .map_err(|_| TrustError::InvalidTimestamp)?;
-    let day: i64 = date[8..10]
-        .parse()
-        .map_err(|_| TrustError::InvalidTimestamp)?;
-    let hour: i64 = time[0..2]
-        .parse()
-        .map_err(|_| TrustError::InvalidTimestamp)?;
-    let min: i64 = time[3..5]
-        .parse()
-        .map_err(|_| TrustError::InvalidTimestamp)?;
-    let sec: i64 = time[6..8]
-        .parse()
-        .map_err(|_| TrustError::InvalidTimestamp)?;
-    if !time.ends_with('Z') {
-        return Err(TrustError::InvalidTimestamp);
-    }
-    Ok(timestamp_from_utc_parts(year, month, day, hour, min, sec))
-}
-
-fn timestamp_from_utc_parts(y: i64, m: i64, d: i64, h: i64, min: i64, s: i64) -> i64 {
-    // Days from civil date algorithm (Howard Hinnant).
-    let civil_from = (m - 14) / 12;
-    let y_adj = y + civil_from;
-    let m_adj = m - 12 * civil_from - 3;
-    let days = d + (153 * m_adj + 2) / 5 + 365 * y_adj + y_adj / 4 - y_adj / 100 + y_adj / 400;
-    let unix_days = days - 719468;
-    unix_days * 86_400 + h * 3600 + min * 60 + s
+    use time::format_description::well_known::Rfc3339;
+    let dt = time::OffsetDateTime::parse(s, &Rfc3339).map_err(|_| TrustError::InvalidTimestamp)?;
+    Ok(dt.unix_timestamp())
 }
 
 #[cfg(test)]
