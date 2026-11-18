@@ -1,5 +1,8 @@
 /target/
+crates/sealim-core/fuzz/artifacts/
+crates/sealim-core/fuzz/target/
 *.key
 *.age
 registry/*.db
 .DS_Store
+crates/sealim-core/fuzz/corpus/
