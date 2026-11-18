@@ -4,6 +4,7 @@ mod claims;
 mod error;
 mod payload;
 mod qrtext;
+mod request;
 mod sign;
 #[cfg(feature = "trust")]
 mod trust;
@@ -18,6 +19,7 @@ pub use payload::{
     PAYLOAD_MIN_LEN, PAYLOAD_VERSION, SIGNATURE_LEN,
 };
 pub use qrtext::{from_qr_text, to_qr_text, QR_PREFIX};
+pub use request::{request_message, sign_request};
 pub use sign::{key_id, seal, signed_message, test_signing_key_for_tests, SIGNING_CONTEXT};
 #[cfg(feature = "trust")]
 pub use trust::{IssuerEntry, TrustStore};

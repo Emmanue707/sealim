@@ -13,7 +13,7 @@ path = "src/main.rs"
 
 [dependencies]
 sealim-core = { path = "../sealim-core", features = ["trust", "keygen"] }
-clap = { version = "4.5", features = ["derive"] }
+clap = { version = "4.5", features = ["derive", "env"] }
 age = { version = "0.11", features = ["armor"] }
 argon2 = "0.5"
 qrcode = "0.14"
@@ -29,6 +29,7 @@ hex = "0.4"
 bech32 = "0.9"
 ed25519-dalek = { version = "2.1", features = ["rand_core"] }
 time = "0.3"
+ureq = { version = "2.10", default-features = false, features = ["tls"] }
 
 [dev-dependencies]
 assert_cmd = "2.0"

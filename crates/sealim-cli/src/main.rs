@@ -9,6 +9,7 @@ mod output;
 mod passphrase;
 mod qr_input;
 mod qrimg;
+mod registry;
 mod trustout;
 
 use std::path::PathBuf;
@@ -112,6 +113,9 @@ enum Commands {
 
         #[arg(long)]
         json: bool,
+
+        #[arg(long, env = "SEALIM_REGISTRY_URL")]
+        registry: Option<String>,
     },
 
     /// Decode a QR payload without verification
@@ -224,6 +228,7 @@ fn run_command(command: Commands) -> Result<ExitCode, exit::CliError> {
             file,
             trust,
             json,
+            registry,
         } => {
             let code = cmd_verify::run(cmd_verify::VerifyOptions {
                 qr,
@@ -232,6 +237,7 @@ fn run_command(command: Commands) -> Result<ExitCode, exit::CliError> {
                 file,
                 trust,
                 json,
+                registry,
             })?;
             Ok(exit::exit_code_for_result(code))
         }

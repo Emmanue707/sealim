@@ -1,0 +1,13 @@
+{
+  "description": "Valid registry POST /v1/documents request signed with TEST KEY seed 0x01..0x20",
+  "seed_note": "TEST KEY ONLY — never use for real credentials",
+  "method": "POST",
+  "path": "/v1/documents",
+  "timestamp": 1735689600,
+  "body": "{\"doc_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"doc_hash\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"key_id\":\"65b60673d6ed884b\",\"issued_at\":1735689600}",
+  "key_id": "65b60673d6ed884b",
+  "public_key_b64url": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ",
+  "signature_b64url": "TuNoT_JMYwkGbxqDf-2fNwZuP8-4wt_eTLHbeqhOQ5fR_sDUjDtsBowFd_cexw5KIey1f8SBNedB5zXmmxXPBA",
+  "body_sha256_hex": "2bc31a92320e69d377212980c0759e1e98e16684642c272022b64a1b4713dee8",
+  "message_hex": "5345414c494d2d5245512d76310a504f53540a2f76312f646f63756d656e74730a313733353638393630300a32626333316139323332306536396433373732313239383063303735396531653938653136363834363432633237323032326236346131623437313364656538"
+}

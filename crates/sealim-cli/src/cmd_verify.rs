@@ -3,7 +3,6 @@ use std::path::PathBuf;
 
 use sealim_core::{verify, TrustStore};
 
-use crate::decode;
 use crate::exit::CliError;
 use crate::output;
 use crate::qr_input;
@@ -15,6 +14,7 @@ pub struct VerifyOptions {
     pub file: Option<PathBuf>,
     pub trust: Option<PathBuf>,
     pub json: bool,
+    pub registry: Option<String>,
 }
 
 pub fn run(opts: VerifyOptions) -> Result<sealim_core::ResultCode, CliError> {
@@ -42,7 +42,7 @@ pub fn run(opts: VerifyOptions) -> Result<sealim_core::ResultCode, CliError> {
         None => None,
     };
 
-    let registry = decode::registry_status_for_qr(&qr_text);
+    let registry = crate::registry::registry_status_for_qr(&qr_text, opts.registry.as_deref());
     let result = verify(&qr_text, file_bytes.as_deref(), &trust, registry);
 
     output::print_verification(&result, opts.json)?;

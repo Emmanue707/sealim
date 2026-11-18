@@ -336,3 +336,55 @@ fn expected_exit_code(code: &str) -> i32 {
         _ => 1,
     }
 }
+
+#[test]
+fn verify_registry_stub_revoked() {
+    use std::io::{Read, Write};
+    use std::net::TcpListener;
+    use std::thread;
+
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let addr = listener.local_addr().unwrap();
+    let body = br#"{"doc_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","status":"revoked","reason":"withdrawn","superseded_by":null,"updated_at":"2026-01-01T00:00:00Z"}"#;
+    thread::spawn(move || {
+        if let Ok((mut stream, _)) = listener.accept() {
+            let _ = write!(
+                stream,
+                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n",
+                body.len()
+            );
+            let _ = stream.write_all(body);
+            let mut discard = [0u8; 32];
+            let _ = stream.read(&mut discard);
+        }
+    });
+
+    let v: VectorFile =
+        serde_json::from_str(&fs::read_to_string(vectors_root().join("revoked.json")).unwrap())
+            .unwrap();
+
+    let dir = TempDir::new().unwrap();
+    let trust_path = dir.path().join("trust.json");
+    fs::write(&trust_path, serde_json::to_string(&v.trust).unwrap()).unwrap();
+
+    let doc_path = dir.path().join("doc.bin");
+    if let Some(h) = &v.file_hex {
+        fs::write(&doc_path, hex::decode(h).unwrap()).unwrap();
+    }
+
+    bin()
+        .args([
+            "verify",
+            "--qr",
+            &v.qr_text,
+            "--file",
+            doc_path.to_str().unwrap(),
+            "--trust",
+            trust_path.to_str().unwrap(),
+            "--registry",
+            &format!("http://{}", addr),
+        ])
+        .assert()
+        .code(1)
+        .stdout(predicate::str::contains("REVOKED"));
+}

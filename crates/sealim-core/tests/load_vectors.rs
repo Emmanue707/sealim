@@ -33,6 +33,13 @@ fn load_all_test_vectors() {
         if path.extension().and_then(|e| e.to_str()) != Some("json") {
             continue;
         }
+        if path
+            .file_name()
+            .and_then(|n| n.to_str())
+            .is_some_and(|n| n.starts_with("registry_request_"))
+        {
+            continue;
+        }
         let text = fs::read_to_string(&path).unwrap();
         let v: VectorFile = serde_json::from_str(&text).unwrap();
         let trust = TrustStore::from_file_json(&serde_json::to_string(&v.trust).unwrap()).unwrap();
