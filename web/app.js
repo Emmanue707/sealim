@@ -178,7 +178,10 @@ function renderResult(out) {
   if (out.doc_id) addMeta(meta, "doc_id", out.doc_id);
   if (out.key_id) addMeta(meta, "key_id", out.key_id);
   if (out.doc_hash) addMeta(meta, "doc_hash", out.doc_hash);
-  if (out.issued_at != null) addMeta(meta, "issued_at", String(out.issued_at));
+  if (out.issued_at != null) {
+    const raw = String(out.issued_at);
+    addMeta(meta, "issued_at", formatIssuedAtUtc(out.issued_at), raw);
+  }
   if (out.detail) addMeta(meta, "detail", out.detail);
 
   const tbody = claimsTable.querySelector("tbody");
@@ -200,11 +203,20 @@ function renderResult(out) {
   }
 }
 
-function addMeta(dl, label, value) {
+function formatIssuedAtUtc(secs) {
+  const d = new Date(Number(secs) * 1000);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
+}
+
+function addMeta(dl, label, value, title) {
   const dt = document.createElement("dt");
   dt.textContent = label;
   const dd = document.createElement("dd");
   dd.textContent = value;
+  if (title) {
+    dd.title = title;
+  }
   dl.append(dt, dd);
 }
 

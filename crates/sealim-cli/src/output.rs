@@ -1,8 +1,23 @@
 use std::io::{self, Write};
 
 use sealim_core::{ResultCode, Verification};
+use time::OffsetDateTime;
 
 use crate::exit::CliError;
+
+fn format_issued_at_utc(secs: u64) -> String {
+    let Ok(dt) = OffsetDateTime::from_unix_timestamp(secs as i64) else {
+        return format!("{secs} (invalid unix time)");
+    };
+    format!(
+        "{:04}-{:02}-{:02} {:02}:{:02} UTC",
+        dt.year(),
+        u8::from(dt.month()),
+        dt.day(),
+        dt.hour(),
+        dt.minute(),
+    )
+}
 
 pub fn print_verification(v: &Verification, json: bool) -> Result<(), CliError> {
     if json {
@@ -93,7 +108,8 @@ fn print_inspect_text(p: &sealim_core::Payload) -> Result<(), CliError> {
     writeln!(out, "flags: 0x{:02x}", p.flags).map_err(|e| CliError::io(e.to_string()))?;
     writeln!(out, "key_id: {}", hex::encode(p.key_id)).map_err(|e| CliError::io(e.to_string()))?;
     writeln!(out, "doc_id: {}", hex::encode(p.doc_id)).map_err(|e| CliError::io(e.to_string()))?;
-    writeln!(out, "issued_at: {}", p.issued_at).map_err(|e| CliError::io(e.to_string()))?;
+    writeln!(out, "issued_at: {}", format_issued_at_utc(p.issued_at))
+        .map_err(|e| CliError::io(e.to_string()))?;
     writeln!(out, "doc_hash: {}", hex::encode(p.doc_hash))
         .map_err(|e| CliError::io(e.to_string()))?;
     writeln!(out, "signature: {}", hex::encode(p.signature))
