@@ -20,6 +20,33 @@ const (
 	docHash = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
 )
 
+func TestCORSHealthz(t *testing.T) {
+	clk := time.Unix(1735689600, 0).UTC()
+	ts, _, _, _ := newTestServer(t, clk)
+
+	optReq, _ := http.NewRequest(http.MethodOptions, ts.URL+"/healthz", nil)
+	optResp, err := http.DefaultClient.Do(optReq)
+	if err != nil {
+		t.Fatal(err)
+	}
+	optResp.Body.Close()
+	if optResp.StatusCode != http.StatusNoContent {
+		t.Fatalf("OPTIONS status %d", optResp.StatusCode)
+	}
+	if optResp.Header.Get("Access-Control-Allow-Origin") != "*" {
+		t.Fatalf("OPTIONS ACAO %q", optResp.Header.Get("Access-Control-Allow-Origin"))
+	}
+
+	getResp, err := http.Get(ts.URL + "/healthz")
+	if err != nil {
+		t.Fatal(err)
+	}
+	getResp.Body.Close()
+	if getResp.Header.Get("Access-Control-Allow-Origin") != "*" {
+		t.Fatalf("GET ACAO %q", getResp.Header.Get("Access-Control-Allow-Origin"))
+	}
+}
+
 func TestHealthzAndIssuers(t *testing.T) {
 	clk := time.Unix(1735689600, 0).UTC()
 	ts, _, _, tr := newTestServer(t, clk)

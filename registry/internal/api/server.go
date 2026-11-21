@@ -45,7 +45,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/v1/documents", s.documentsRoot)
 	mux.HandleFunc("/v1/revocations", s.revocations)
 	mux.HandleFunc("/v1/documents/", s.documentsSub)
-	return mux
+	return withCORS(mux)
 }
 
 func (s *Server) healthz(w http.ResponseWriter, r *http.Request) {
