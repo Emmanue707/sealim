@@ -71,9 +71,8 @@ mod tests {
         let addr = listener.local_addr().unwrap();
         let body = r#"{"doc_id":"aa","status":"revoked","reason":"withdrawn","superseded_by":null,"updated_at":"2026-01-01T00:00:00Z"}"#;
         let base = format!("http://{}", addr);
-        let client = thread::spawn(move || {
-            query_document_status(&base, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-        });
+        let client =
+            thread::spawn(move || query_document_status(&base, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
         let (mut stream, _) = listener.accept().expect("stub accept");
         let _ = write!(
             stream,
@@ -83,7 +82,10 @@ mod tests {
         );
         let mut discard = [0u8; 64];
         let _ = stream.read(&mut discard);
-        let st = client.join().expect("client thread").expect("registry status");
+        let st = client
+            .join()
+            .expect("client thread")
+            .expect("registry status");
         assert_eq!(st, RegistryStatus::Revoked);
     }
 }
