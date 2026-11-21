@@ -70,20 +70,20 @@ mod tests {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         let addr = listener.local_addr().unwrap();
         let body = r#"{"doc_id":"aa","status":"revoked","reason":"withdrawn","superseded_by":null,"updated_at":"2026-01-01T00:00:00Z"}"#;
-        thread::spawn(move || {
-            if let Ok((mut stream, _)) = listener.accept() {
-                let _ = write!(
-                    stream,
-                    "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{}",
-                    body.len(),
-                    body
-                );
-                let mut discard = [0u8; 64];
-                let _ = stream.read(&mut discard);
-            }
-        });
         let base = format!("http://{}", addr);
-        let st = query_document_status(&base, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap();
+        let client = thread::spawn(move || {
+            query_document_status(&base, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        });
+        let (mut stream, _) = listener.accept().expect("stub accept");
+        let _ = write!(
+            stream,
+            "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{}",
+            body.len(),
+            body
+        );
+        let mut discard = [0u8; 64];
+        let _ = stream.read(&mut discard);
+        let st = client.join().expect("client thread").expect("registry status");
         assert_eq!(st, RegistryStatus::Revoked);
     }
 }
