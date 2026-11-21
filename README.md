@@ -20,6 +20,8 @@ flowchart LR
 
 ## Quick start
 
+A hosted copy of the browser verifier runs at [https://sealim.waghitech.com](https://sealim.waghitech.com) (same static page as `web/` in this repository).
+
 Requires Rust (stable) and Go 1.26 or newer.
 
 ```bash
