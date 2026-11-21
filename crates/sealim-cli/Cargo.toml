@@ -14,7 +14,7 @@ path = "src/main.rs"
 [dependencies]
 sealim-core = { path = "../sealim-core", features = ["trust", "keygen"] }
 clap = { version = "4.5", features = ["derive", "env"] }
-age = { version = "0.11", features = ["armor"] }
+age = { version = "0.12", features = ["armor"] }
 argon2 = "0.5"
 qrcode = "0.14"
 image = { version = "0.25", default-features = false, features = ["png"] }
