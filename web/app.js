@@ -1,4 +1,10 @@
 import init, { verify, registry_doc_id } from "./pkg/sealim_wasm.js";
+import {
+  canScanWithCamera,
+  decodeQrImage,
+  qrDecoderUnavailableMessage,
+  scanQrInSource,
+} from "./qr-decode.js";
 
 const RESULT_COPY = {
   VALID: {
@@ -90,23 +96,6 @@ function readFileAsText(file) {
     reader.onerror = () => reject(reader.error);
     reader.readAsText(file);
   });
-}
-
-async function decodeQrImage(file) {
-  if ("BarcodeDetector" in window) {
-    const bitmap = await createImageBitmap(file);
-    const detector = new BarcodeDetector({ formats: ["qr_code"] });
-    const codes = await detector.detect(bitmap);
-    bitmap.close();
-    const raw = codes[0]?.rawValue;
-    if (raw) {
-      return raw.trim();
-    }
-    throw new Error("No QR code found in the image.");
-  }
-  throw new Error(
-    "This browser cannot decode QR images locally. Paste the SL1: text instead.",
-  );
 }
 
 function registryBaseFromQuery() {
@@ -343,16 +332,25 @@ async function loadDemo() {
 function setupCamera() {
   const btn = document.getElementById("scan-camera");
   const video = document.getElementById("camera-preview");
-  if (!("BarcodeDetector" in window) || !navigator.mediaDevices?.getUserMedia) {
+  const status = document.getElementById("trust-status");
+  if (!canScanWithCamera()) {
     return;
   }
   btn.hidden = false;
+  const unavailable = qrDecoderUnavailableMessage();
+  if (unavailable) {
+    btn.title = unavailable;
+  }
   let stream;
   let timer;
 
   btn.addEventListener("click", async () => {
     if (stream) {
       stop();
+      return;
+    }
+    if (unavailable) {
+      status.textContent = unavailable;
       return;
     }
     try {
@@ -363,22 +361,18 @@ function setupCamera() {
       video.hidden = false;
       await video.play();
       btn.textContent = "Stop camera";
-      timer = window.setInterval(async () => {
-        try {
-          const detector = new BarcodeDetector({ formats: ["qr_code"] });
-          const codes = await detector.detect(video);
-          const raw = codes[0]?.rawValue;
-          if (raw) {
-            document.getElementById("qr-text").value = raw.trim();
-            stop();
-          }
-        } catch {
-          /* ignore frame errors */
-        }
+      timer = window.setInterval(() => {
+        scanQrInSource(video)
+          .then((raw) => {
+            if (raw) {
+              document.getElementById("qr-text").value = raw;
+              stop();
+            }
+          })
+          .catch(() => {});
       }, 500);
     } catch {
-      document.getElementById("trust-status").textContent =
-        "Camera access was denied or is unavailable.";
+      status.textContent = "Camera access was denied or is unavailable.";
     }
   });
 
