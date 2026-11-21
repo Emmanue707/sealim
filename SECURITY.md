@@ -8,7 +8,7 @@
 
 ## Reporting a vulnerability
 
-Report security issues **privately** to **ekokele707@gmail.com**. GitHub private vulnerability reporting for this repository may also be used when enabled.
+Report security issues **privately** to **ekokele707@gmail.com** or via **GitHub private vulnerability reporting** on this repository (enabled).
 
 Include:
 
