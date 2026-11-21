@@ -175,6 +175,7 @@ docker build -t sealim-registry:local registry/
 - [x] Registry: SQLite-backed API from `SPEC.md`
 - [x] Browser verifier: WASM plus static UI
 
+Next steps: an independent security audit, tightening the draft [SPEC.md](SPEC.md), better signed-revocation-list caching in verifiers, and more issuer-side tooling around registration and key rotation. Sealim is still experimental and **must not** be used for real credentials or legal decisions until an audit and hardening pass are done.
 
 Normative details: [SPEC.md](SPEC.md). Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
 
