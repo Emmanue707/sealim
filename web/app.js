@@ -299,22 +299,41 @@ async function onTrustFile(file) {
   }
 }
 
+function setDocumentFile(file) {
+  const input = document.getElementById("doc-file");
+  const name = document.getElementById("doc-name");
+  const dt = new DataTransfer();
+  dt.items.add(file);
+  input.files = dt.files;
+  name.textContent = file
+    ? `Selected ${file.name}. Hashing stays in this browser.`
+    : "Drop a file here or choose one. Nothing is uploaded.";
+}
+
 async function loadDemo() {
   const status = document.getElementById("trust-status");
+  clearResult();
   const base = new URL("../examples/university-of-waghi/", window.location.href);
   try {
-    const [trustResp, qrResp] = await Promise.all([
+    const [trustResp, qrResp, transcriptResp] = await Promise.all([
       fetch(new URL("trust.json", base)),
       fetch(new URL("qr.txt", base)),
+      fetch(new URL("transcript.txt", base)),
     ]);
-    if (!trustResp.ok || !qrResp.ok) {
+    if (!trustResp.ok || !qrResp.ok || !transcriptResp.ok) {
       status.textContent =
         "Demo fixtures are missing. Run examples/university-of-waghi/generate.sh from the repository.";
       return;
     }
     trustJsonText = await trustResp.text();
     document.getElementById("qr-text").value = (await qrResp.text()).trim();
-    status.textContent = "Loaded University of Waghi demo trust and QR text.";
+    const transcriptBytes = await transcriptResp.arrayBuffer();
+    setDocumentFile(
+      new File([transcriptBytes], "transcript.txt", { type: "text/plain" }),
+    );
+    status.textContent =
+      "Loaded University of Waghi demo trust, QR text, and transcript.";
+    await onVerify();
   } catch {
     status.textContent =
       "Could not load demo files. Serve the repository root (see README) and open /web/.";
